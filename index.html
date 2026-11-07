@@ -1,0 +1,1309 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dear Siri ❤️ | A Six-Year Story</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --pink: #ff9fcf;
+    --rose: #ff4f9a;
+    --purple: #9b6bff;
+    --muted: #d5bfd2;
+    --glass: rgba(255,255,255,0.065);
+    --border: rgba(255,255,255,0.16);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    min-height: 100vh;
+    background: #080510;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+}
+
+#stars {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -3;
+}
+
+.ambient {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 15% 20%, rgba(130,35,105,.25), transparent 45%),
+        radial-gradient(ellipse at 85% 80%, rgba(90,45,170,.2), transparent 45%),
+        linear-gradient(160deg, #090513, #10091c 55%, #080510);
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    opacity: .12;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+}
+
+.page {
+    display: none;
+    min-height: 100vh;
+    width: 100%;
+    padding: 45px 18px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    animation: pageEnter 1s ease both;
+}
+
+.page.active { display: flex; }
+
+@keyframes pageEnter {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1, h2, h3 { font-weight: 500; }
+
+h1 { font-size: clamp(2.5rem, 7vw, 4.5rem); }
+
+h2 { font-size: clamp(1.8rem, 5vw, 2.7rem); }
+
+.script {
+    font-family: 'Dancing Script', cursive;
+    color: var(--pink);
+}
+
+.serif { font-family: 'Cormorant Garamond', serif; }
+
+p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 2;
+}
+
+.card {
+    width: min(680px, 96%);
+    padding: clamp(25px, 5vw, 48px);
+    border: 1px solid var(--border);
+    border-radius: 26px;
+    background: var(--glass);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 20px 90px rgba(0,0,0,.35);
+}
+
+.eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-size: 10px;
+    color: #e7a8ce;
+    margin-bottom: 18px;
+}
+
+button {
+    font-family: 'Poppins', sans-serif;
+    border: 1px solid transparent;
+    border-radius: 35px;
+    padding: 14px 27px;
+    margin: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: white;
+    background: linear-gradient(120deg, #ff4d99, #9552ed);
+    box-shadow: 0 8px 30px rgba(255,70,150,.22);
+    transition: .35s ease;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 35px rgba(255,70,150,.4);
+}
+
+button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 4px;
+}
+
+.btn-outline {
+    background: rgba(255,255,255,.07);
+    border-color: rgba(255,255,255,.25);
+    box-shadow: none;
+}
+
+.music-control {
+    position: fixed;
+    z-index: 20;
+    right: 15px;
+    top: 15px;
+    background: rgba(255,255,255,.1);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    padding: 10px 16px;
+    font-size: 11px;
+    margin: 0;
+}
+
+.progress {
+    width: 130px;
+    height: 2px;
+    background: #ffffff25;
+    margin: 22px auto;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.progress span {
+    display: block;
+    height: 100%;
+    width: 25%;
+    background: var(--pink);
+    transition: width .5s;
+}
+
+.cat {
+    font-size: 65px;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+/* COUNTDOWN */
+
+.countdown-wrap {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 28px 0;
+}
+
+.time-box {
+    min-width: 75px;
+    padding: 15px 10px;
+    border-radius: 14px;
+    border: 1px solid #ffffff22;
+    background: #ffffff0a;
+}
+
+.time-box strong {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    color: var(--pink);
+}
+
+.time-box span {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #cbb5ca;
+}
+
+/* PHOTO GALLERY */
+
+.gallery-section {
+    width: min(900px, 100%);
+    margin: 25px auto 0;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.gallery-card {
+    overflow: hidden;
+    border: 1px solid #ffffff25;
+    border-radius: 18px;
+    background: rgba(255,255,255,.055);
+    transition: .35s ease;
+}
+
+.gallery-card:hover {
+    transform: translateY(-5px);
+    border-color: #ff9fcf88;
+    box-shadow: 0 12px 35px #0005;
+}
+
+.gallery-card img {
+    width: 100%;
+    height: 250px;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+}
+
+.gallery-caption {
+    padding: 16px 12px 19px;
+}
+
+.gallery-caption h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: #ffacd2;
+    margin-bottom: 7px;
+}
+
+.gallery-caption p {
+    font-size: 12px;
+    line-height: 1.8;
+    color: #e2cddd;
+}
+
+.cat-gallery-art {
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    background:
+        radial-gradient(circle at 50% 40%, #a64c8a66, transparent 65%),
+        linear-gradient(145deg, #351b40, #171026);
+}
+
+.cat-gallery-art .cat-bouquet {
+    font-size: 76px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.cat-gallery-art small {
+    color: #ffd0e7;
+    font-family: 'Dancing Script', cursive;
+    font-size: 22px;
+}
+
+
+.gallery-placeholder {
+    width: 100%;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    background: radial-gradient(circle at 50% 40%, #a64c8a66, transparent 65%), linear-gradient(145deg, #351b40, #171026);
+    color: #ffd0e7;
+    font-family: 'Dancing Script', cursive;
+    font-size: 18px;
+}
+
+.gallery-placeholder span { font-size: 48px; }
+@media(max-width: 520px) {
+    .gallery-grid { gap: 10px; }
+    .gallery-card img,
+    .cat-gallery-art { height: 190px; }
+    .gallery-caption { padding: 12px 9px 15px; }
+    .gallery-caption h3 { font-size: 19px; }
+    .gallery-caption p { font-size: 11px; }
+    .cat-gallery-art .cat-bouquet { font-size: 58px; }
+}
+
+/* ENVELOPE */
+
+.envelope-area {
+    width: min(330px, 85vw);
+    height: 230px;
+    margin: 30px auto 20px;
+    perspective: 1000px;
+    position: relative;
+}
+
+.envelope {
+    width: 100%;
+    height: 190px;
+    position: absolute;
+    bottom: 0;
+    background: linear-gradient(135deg, #c94c89, #772e78);
+    border-radius: 8px;
+    box-shadow: 0 15px 40px #0008;
+}
+
+.envelope::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-left: 165px solid transparent;
+    border-right: 165px solid transparent;
+    border-top: 120px solid #e982b1;
+    transform-origin: top;
+    transition: transform .9s ease;
+    z-index: 3;
+}
+
+.envelope.open::before {
+    transform: rotateX(180deg);
+    z-index: 0;
+}
+
+.envelope::after {
+    content: "❤️";
+    position: absolute;
+    top: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    font-size: 28px;
+    transition: .5s;
+}
+
+.envelope.open::after { opacity: 0; }
+
+.letter {
+    position: absolute;
+    z-index: 2;
+    left: 8%;
+    width: 84%;
+    height: 155px;
+    bottom: 15px;
+    border-radius: 6px;
+    padding: 20px 12px;
+    background: #fff0f6;
+    color: #76284f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: transform 1s ease;
+}
+
+.letter p {
+    color: #76284f;
+    font-family: 'Dancing Script', cursive;
+    font-size: 22px;
+}
+
+.envelope.open .letter { transform: translateY(-105px); }
+
+.envelope.open .letter p {
+    animation: letterReveal 1s .6s both;
+}
+
+@keyframes letterReveal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.hidden { display: none !important; }
+
+/* STORY */
+
+.story-page {
+    display: none;
+    min-height: 100vh;
+    padding: 45px 14px 60px;
+    animation: pageEnter .8s ease both;
+}
+
+.story-page.active { display: block; }
+
+.story-container {
+    width: min(850px, 100%);
+    margin: auto;
+    padding: clamp(22px, 5vw, 50px);
+    background: rgba(255,255,255,.055);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    backdrop-filter: blur(15px);
+}
+
+.story-title {
+    font-family: 'Dancing Script', cursive;
+    color: var(--pink);
+    font-size: clamp(3rem, 8vw, 4.5rem);
+    text-align: center;
+}
+
+.story-subtitle {
+    text-align: center;
+    margin: 10px 0 35px;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.story-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 27px;
+    color: #ffacd2;
+    margin: 38px 0 12px;
+    font-weight: 600;
+}
+
+.story-text {
+    white-space: pre-line;
+    font-size: 14px;
+    line-height: 2.15;
+    color: #eee0ed;
+}
+
+.story-text strong {
+    color: #ffadd2;
+    font-weight: 600;
+}
+
+.story-divider {
+    width: 65px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--rose), var(--purple));
+    margin: 28px auto;
+}
+
+.story-next {
+    text-align: center;
+    margin-top: 45px;
+}
+
+/* FINALE */
+
+.final-page {
+    position: relative;
+    overflow: hidden;
+}
+
+.final-glow {
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: #e9369b;
+    filter: blur(130px);
+    opacity: .2;
+    animation: glowPulse 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes glowPulse {
+    0%,100% { transform: scale(.8); opacity: .15; }
+    50% { transform: scale(1.3); opacity: .35; }
+}
+
+.final-content {
+    position: relative;
+    z-index: 2;
+}
+
+.final-kicker {
+    letter-spacing: 5px;
+    color: #d9a4c9;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+.final-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(3.2rem, 10vw, 5.5rem);
+    color: var(--pink);
+    margin: 20px 0;
+}
+
+.typewriter {
+    min-height: 75px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 6vw, 42px);
+    color: white;
+    letter-spacing: 1px;
+}
+
+.final-message {
+    max-width: 500px;
+    margin: 20px auto;
+}
+
+.proposal-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.proposal-buttons button {
+    width: min(350px, 95%);
+}
+
+.response {
+    margin: 25px auto 0;
+    min-height: 65px;
+    max-width: 500px;
+    color: #ffb4d7;
+    font-size: 15px;
+    line-height: 2;
+}
+
+.heart {
+    position: fixed;
+    z-index: 1;
+    bottom: -30px;
+    pointer-events: none;
+    animation: heartRise 8s linear forwards;
+}
+
+@keyframes heartRise {
+    0% { transform: translateY(0) rotate(0); opacity: 0; }
+    10% { opacity: .7; }
+    100% { transform: translateY(-110vh) rotate(300deg); opacity: 0; }
+}
+
+@media(max-width: 600px) {
+    .card { padding: 28px 18px; }
+    .story-text { font-size: 13px; }
+    .time-box { min-width: 65px; }
+    .time-box strong { font-size: 25px; }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+<div class="ambient"></div>
+
+<button class="music-control" id="musicButton" onclick="toggleMusic()">
+    ♫ Music Off
+</button>
+
+<!-- PAGE 1: WELCOME -->
+<section class="page active" id="page1">
+    <div class="card">
+        <div class="eyebrow">A little story made with love</div>
+        <div class="cat">🌙</div>
+        <h1 class="script">Hey Siri...</h1>
+        <p style="margin-top:18px">
+            Neekosam oka chinna surprise ready chesanu.<br>
+            Adhi chudadaniki ready ga unnava?
+        </p>
+        <div class="progress"><span style="width:15%"></span></div>
+        <button onclick="showPage('page2')">Begin Our Little Story →</button>
+    </div>
+</section>
+
+<!-- PAGE 2: COUNTDOWN -->
+<section class="page" id="page2">
+    <div class="card">
+        <div class="eyebrow">The day everything began</div>
+        <h1 class="script">August 6, 2020</h1>
+        <p style="margin-top:14px">
+            Aa roju ninnu first time chusina moment...
+            appati nunchi ippati varaku.
+        </p>
+
+        <div class="countdown-wrap">
+            <div class="time-box">
+                <strong id="days">0</strong>
+                <span>DAYS</span>
+            </div>
+            <div class="time-box">
+                <strong id="hours">0</strong>
+                <span>HOURS</span>
+            </div>
+            <div class="time-box">
+                <strong id="minutes">0</strong>
+                <span>MINUTES</span>
+            </div>
+            <div class="time-box">
+                <strong id="seconds">0</strong>
+                <span>SECONDS</span>
+            </div>
+        </div>
+
+        <p style="font-size:12px">
+            Oka date... enno memories... marichipoleni oka feeling. ❤️
+        </p>
+        <div class="progress"><span style="width:35%"></span></div>
+        <button onclick="showPage('page3')">Continue →</button>
+    </div>
+</section>
+
+<!-- PAGE 3: LITTLE INTRO -->
+<section class="page" id="page3">
+    <div class="card">
+        <div class="cat">✨</div>
+        <div class="eyebrow">Before the memories</div>
+        <h2 class="script">Oka chinna request...</h2>
+        <p style="margin-top:18px">
+            Ee website lo konni chinna surprises unnayi.<br>
+            Slow ga chudu... endhukante prathi page venuka<br>
+            oka chinna feeling undhi.
+        </p>
+        <div class="progress"><span style="width:50%"></span></div>
+        <button onclick="showPage('page4')">Okay, Continue ❤️</button>
+    </div>
+</section>
+
+<!-- PAGE 4: PHOTO GALLERY -->
+<section class="page" id="page4">
+    <div class="card">
+        <div class="eyebrow">A few special memories</div>
+        <h1 class="script">Little Moments 🌸</h1>
+        <p>Konni moments chinnave... kaani naaku chala special.</p>
+
+        <div class="gallery-section">
+            <div class="gallery-grid">
+
+                <!-- PHOTO 1 -->
+                <div class="gallery-card">
+                    <img src="./images/siri.jpeg"
+                         alt="Siri smiling"
+                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
+
+                    <div class="gallery-placeholder hidden">
+                        <span>🌷</span>
+                        <small>siri.jpeg add cheyyi</small>
+                    </div>
+
+                    <div class="gallery-caption">
+                        <h3>Special Smile ❤️</h3>
+                        <p>
+                            Nee navvu chusthe, aa moment lo vere
+                            em gurthundadhu... adhi chaalu.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- PHOTO 2 -->
+                <div class="gallery-card">
+                    <img src="./images/siri2.jpeg"
+                         alt="Siri in a blue saree"
+                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
+
+                    <div class="gallery-placeholder hidden">
+                        <span>🌸</span>
+                        <small>siri2.jpeg add cheyyi</small>
+                    </div>
+
+                    <div class="gallery-caption">
+                        <h3>A Beautiful View ✨</h3>
+                        <p>
+                            "Konni andhalu maatallo cheppalem...
+                            oka chinna choopu chaalu, gurthundipothayi."
+                        </p>
+                    </div>
+                </div>
+
+                <!-- PHOTO 3 -->
+                <div class="gallery-card">
+                    <img src="./images/siri3.jpeg"
+                         alt="Siri looking at the temple"
+                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
+
+                    <div class="gallery-placeholder hidden">
+                        <span>🛕</span>
+                        <small>siri3.jpeg add cheyyi</small>
+                    </div>
+
+                    <div class="gallery-caption">
+                        <h3>A Moment to Remember 💗</h3>
+                        <p>
+                            "Aa gopuram entha beautiful ga unna...
+                            aa moment lo naa gurthullo nilichindhi nuvve."
+                        </p>
+                    </div>
+                </div>
+
+                <!-- CUTE CAT WITH BOUQUET -->
+                <div class="gallery-card">
+                    <div class="cat-gallery-art">
+                        <div class="cat-bouquet">🐱💐</div>
+                        <small>A Little Gift For You</small>
+                    </div>
+
+                    <div class="gallery-caption">
+                        <h3>Just For You 🌷</h3>
+                        <p>
+                            "Oka chinna bouquet neekosam...
+                            endhukante nee smile kanna beautiful
+                            gift naaku inkem undhi?"
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <p style="margin-top:22px;font-size:12px">
+            Konni photos... konni memories... naaku maatram anni special.
+        </p>
+        <div class="progress"><span style="width:65%"></span></div>
+        <button onclick="showPage('page5')">One More Thing →</button>
+    </div>
+</section>
+
+<!-- PAGE 5: ENVELOPE -->
+<section class="page" id="page5">
+    <div class="card">
+        <div class="eyebrow">A letter from my heart</div>
+        <h1 class="script">Something for you...</h1>
+        <p style="margin-top:12px">
+            Ee envelope lo chala rojula nunchi cheppalanukunna
+            oka chinna story undhi.
+        </p>
+
+        <div class="envelope-area">
+            <div class="envelope" id="envelope">
+                <div class="letter">
+                    <p>Dear Siri...</p>
+                    <p style="font-size:14px">With genuine feelings ❤️</p>
+                </div>
+            </div>
+        </div>
+
+        <button id="openEnvelopeButton" onclick="openEnvelope()">
+            Open My Letter 💌
+        </button>
+
+        <div id="letterActions" class="hidden">
+            <p style="color:#ffb3d6;margin:15px 0">
+                Ee story motham nee kosam...
+            </p>
+            <button onclick="showStory()">Read My Story →</button>
+        </div>
+    </div>
+</section>
+
+<!-- COMPLETE SIX-YEAR STORY -->
+<section class="story-page" id="storyPage">
+    <div class="story-container">
+
+        <h1 class="story-title">Dear Siri ❤️</h1>
+        <p class="story-subtitle">A STORY THAT STARTED ON AUGUST 6, 2020</p>
+        <div class="story-divider"></div>
+
+        <h3 class="story-date">August 6, 2020 (Sravani Marriage lo😻)</h3>
+        <p class="story-text">
+Ee date naaku eppatiki gurthundipothundi.
+
+Endhukante aa roju ninnu first time chusinappudu, nijanga em jarigindo naaku appudu ardham kaaledhu.
+
+Nuvvu chala cute ga unnav. Ninnu chusina aa moment nunchi, endhuko teliyadhu, naa attention motham nee meedhane undipoyindhi.
+
+Aa roju motham ninnu admire chesthu unna. Next day kuda adhe feeling.
+
+Appudu naaku oka question vachindhi...
+
+"Idhi attraction aa? Leka love aa?"
+
+Naaku appudu aa feelings ki peru pettadam kuda raadhu.
+
+Aa roje neeku cheppeddham anukunna. Kaani appudu nenu 8th or 9th class chaduvuthunna. Ela cheppalo teliyadhu. Chepthe em anukuntavo ani bhayam. Andhuke appudu naa feelings ni naalone dachukunna.
+
+Kaani appudu naaku teliyadhu, aa chinna feeling oka roju six years journey avuthundhani.
+        </p>
+
+        <h3 class="story-date">August 6, 2021 – August 6, 2026</h3>
+        <p class="story-text">
+Chusthu chusthune six years aipoyayi.
+
+Ee six years lo enno sarlu neeku cheppali anukunna. Kaani prathisari edho oka reason tho aagipoya.
+
+Konni feelings cheppakunda unte marchipotham anukuntaam. Kaani konni feelings matram time tho paatu inka special aipothayi.
+
+Naa vishayam lo kuda adhe jarigindhi.
+        </p>
+
+        <h3 class="story-date">Our Little Memories ❤️</h3>
+        <p class="story-text">
+Manam eppudo oka marriage lo kalavadam, festivals lo kalavadam, appudappudu maatladukovadam...
+
+Bayataki chusthe avi chala normal moments la anipinchachu.
+
+Kaani naaku matram avi chala special memories.
+
+Neetho maatladina prathi sari, neetho konchem time spend chesina prathi sari, aa moments ni nenu chala special ga feel avuthanu.
+
+Nuvvu naatho spend chesina time neeku oka normal memory ayyi undochu.
+
+Kaani naaku matram avi naa life lo gurthundipoye memories.
+        </p>
+
+        <h3 class="story-date">Teja Pelli, Shekharma Pelli & Shankar Pelli</h3>
+        <p class="story-text">
+Ee weddings lo neetho spend chesina konni moments naaku ippatiki gurthunnayi.
+
+Especially Shankar pelli roju...
+
+Around 2 o'clock time lo nee room lo unna moments gurthunnayi.
+
+Nuvvu saree lo chala beautiful ga unnav.
+
+Nijam cheppalante, aa roju ninnu chusi em compliment ivvalo kuda naaku ardham kaaledhu.
+
+"Chala baagunnav" ani cheppali anukunna.
+
+Neetho inka konchem maatladali anukunna.
+
+Oka photo kuda adugudham anukunna.
+
+Kaani akkada andaroo undatam valla adagalekapoya.
+
+Next day aina maatladudham anukunna. Kaani nenu vere panullo busy aipoya, nuvvu kuda tondaraga vellipoyav.
+
+Ala aa opportunity kuda miss aipoyindhi.
+
+Ippudu venakki thirigi chusthe, aa chinna moments kuda entha special ga anipisthunnayo cheppalenu.
+        </p>
+
+        <h3 class="story-date">Something I Never Told You...</h3>
+        <p class="story-text">
+Nijam cheppalante, neeku chala compliments cheppali anukunna.
+
+Nee smile gurinchi, nee beauty gurinchi, nee dressing gurinchi, nee way of talking gurinchi...
+
+Kaani cheppaledhu.
+
+Endhukante nuvvu vaatini ela teesukuntavo naaku teliyadhu.
+
+Nenu edhaina compliment isthe, nuvvu wrong ga understand chesukuntavemo ani bhayam.
+
+Direct ga hint ichina, nannu tease chestharemo ani anipinchedhi.
+
+Annitikanna ekkuvaga, mana madhya unna relationship spoil aipothundhemo ani bhayapadda.
+
+Andhuke chala sarlu cheppali anukunna feelings ni kuda navvuthu cover chesesa.
+
+Kaani okati matram cheppali...
+
+<strong>Nuvvu beautiful ga unnav ani cheppadaniki nee appearance okkate reason kaadhu. Nuvvu maatlade vidhanam, nee smile, nee presence... ivanni kalipi ninnu naaku special ga anipinchela chesthayi.</strong>
+
+Neetho maatladinappudu time ela gadichipothundo kuda teliyadhu.
+        </p>
+
+        <h3 class="story-date">Why Am I Telling You Now?</h3>
+        <p class="story-text">
+Six years nunchi naa mind lo unna oka feeling ni inka dachukovadam naaku ishtam ledhu.
+
+Repu em avuthundho naaku teliyadhu.
+
+Mana future ela untundho kuda teliyadhu.
+
+Kaani oka vishayam matram naaku clear ga undhi.
+
+Neeku cheppakunda unte, idhi naa life lo oka regret ga migilipothundhi.
+
+Andhuke ee roju neeku chepthunna.
+
+Siri, naaku nuvvante istam.
+
+Aa istam eppudu start ayyindho exact ga cheppagalanu.
+
+<strong>August 6, 2020.</strong>
+
+Kaani aa feeling ni ela explain cheyyalo matram ippatiki nerchukuntunna.
+
+Nenu ninnu six years nunchi admire chesthunna ani cheppadam kanna, ee six years lo nuvvu naaku entha special ga anipinchavo cheppalanukuntunna.
+
+Nenu perfect person ni ani cheppanu.
+
+Naa daggara anni answers unnayani kuda cheppanu.
+
+Kaani ninnu respect chesthu, nee feelings ki value isthu, genuine ga undagalanu.
+        </p>
+
+        <h3 class="story-date">One Last Thing... ❤️</h3>
+        <p class="story-text">
+Nenu ee story chepthunnadhi nee nunchi immediate ga oka answer expect chesthu kaadhu.
+
+Nuvvu em feel avuthunnavo, nee mind lo em undho, adhi naaku important.
+
+Neeku kuda naa meedha alanti feelings unte, nijanga adhi naaku chala happy moment avuthundhi.
+
+Neeku konchem time kavali anipisthe, adhi kuda completely okay.
+
+Leka neeku alanti feelings levu anipisthe, adhi kuda nenu respect chesthanu.
+
+Endhukante naa feelings cheppadam naa responsibility. Kaani nee feelings decide cheyyadam nee right.
+        </p>
+
+        <div class="story-divider"></div>
+
+        <h3 class="story-date">Finally, Siri... ❤️</h3>
+        <p class="story-text">
+August 6, 2020 roju ninnu first time chusina moment nunchi, November 7, 2026 varaku...
+
+Enno rojulu gadichayi, enno occasions vachayi, enno chances miss ayyayi.
+
+Kaani ippatiki cheppalanukunna oka maata matram maaraledhu.
+
+<strong>I LOVE YOU, SIRI. ❤️</strong>
+
+And for once, I don't want to hide what I feel.
+
+With lots of genuine feelings,
+
+<strong>Someone who has admired you since August 6, 2020.</strong>
+        </p>
+
+        <div class="story-divider"></div>
+
+        <div class="story-next">
+            <p style="font-size:16px;color:#ffb4d6">
+                Ippudu naa story lo final page ki veldhama?
+            </p>
+            <button onclick="showFinalPage()">Next →</button>
+        </div>
+
+    </div>
+</section>
+
+<!-- FINAL PAGE -->
+<section class="page final-page" id="finalPage">
+    <div class="final-glow"></div>
+
+    <div class="card final-content">
+        <div class="final-kicker">A feeling six years in the making</div>
+
+        <h1 class="final-title">Finally, Siri...</h1>
+
+        <p class="final-message">
+            August 6, 2020 roju ninnu first time chusina moment nunchi,
+            November 7, 2026 varaku...
+        </p>
+
+        <p class="final-message">
+            Enno rojulu gadichayi, enno occasions vachayi,
+            enno chances miss ayyayi.
+        </p>
+
+        <p class="final-message">
+            Kaani ippatiki cheppalanukunna oka maata matram maaraledhu.
+        </p>
+
+        <div class="typewriter" id="typewriter"></div>
+
+        <p class="final-message">
+            And for once, I don't want to hide what I feel.
+        </p>
+
+        <div class="proposal-buttons">
+            <button onclick="showResponse('yes')">
+                Naaku kuda nuvvante istam ❤️
+            </button>
+
+            <button class="btn-outline" onclick="showResponse('time')">
+                Konchem time kavali
+            </button>
+
+            <button class="btn-outline" onclick="showResponse('no')">
+                Naaku istam ledhu
+            </button>
+        </div>
+
+        <div class="response" id="response"></div>
+
+        <p style="font-size:11px;margin-top:20px;color:#d0b4cc">
+            With lots of genuine feelings,<br>
+            Someone who has admired you since August 6, 2020.
+        </p>
+    </div>
+</section>
+
+<script>
+
+/* PAGE NAVIGATION */
+
+function hideAll() {
+    document.querySelectorAll('.page, .story-page').forEach(page => {
+        page.classList.remove('active');
+    });
+}
+
+function showPage(id) {
+    hideAll();
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function showStory() {
+    hideAll();
+    document.getElementById('storyPage').classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function showFinalPage() {
+    hideAll();
+    document.getElementById('finalPage').classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    startFinalReveal();
+}
+
+/* COUNTDOWN FROM AUGUST 6, 2020 */
+
+function updateCountdown() {
+    const startDate = new Date(2020, 7, 6, 0, 0, 0);
+    const now = new Date();
+
+    let difference = Math.max(0, now - startDate);
+
+    const days = Math.floor(difference / 86400000);
+    const hours = Math.floor((difference % 86400000) / 3600000);
+    const minutes = Math.floor((difference % 3600000) / 60000);
+    const seconds = Math.floor((difference % 60000) / 1000);
+
+    document.getElementById('days').textContent =
+        days.toLocaleString('en-IN');
+
+    document.getElementById('hours').textContent =
+        String(hours).padStart(2, '0');
+
+    document.getElementById('minutes').textContent =
+        String(minutes).padStart(2, '0');
+
+    document.getElementById('seconds').textContent =
+        String(seconds).padStart(2, '0');
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ENVELOPE ANIMATION */
+
+function openEnvelope() {
+    const envelope = document.getElementById('envelope');
+    const button = document.getElementById('openEnvelopeButton');
+    const actions = document.getElementById('letterActions');
+
+    envelope.classList.add('open');
+    button.classList.add('hidden');
+
+    setTimeout(() => {
+        actions.classList.remove('hidden');
+    }, 1300);
+}
+
+/* CINEMATIC FINAL TEXT */
+
+let finalRevealStarted = false;
+
+function startFinalReveal() {
+    if (finalRevealStarted) return;
+
+    finalRevealStarted = true;
+
+    const text = "I LOVE YOU, SIRI. ❤️";
+    const element = document.getElementById('typewriter');
+    let index = 0;
+
+    function typeNext() {
+        if (index < text.length) {
+            element.textContent += text.charAt(index);
+            index++;
+            setTimeout(typeNext, 110);
+        }
+    }
+
+    setTimeout(typeNext, 700);
+}
+
+/* PROPOSAL RESPONSES */
+
+function showResponse(type) {
+    const response = document.getElementById('response');
+
+    if (type === 'yes') {
+        response.textContent =
+            "Really Siri? Ee moment naaku chala special. Thank you! ❤️";
+    } else if (type === 'time') {
+        response.textContent =
+            "Of course Siri! Neeku entha time kavalo antha teesuko. No pressure. ❤️";
+    } else {
+        response.textContent =
+            "It's completely okay Siri. Nee feelings ni nenu respect chesthanu. Thank you for being honest. ❤️";
+    }
+}
+
+/* ORIGINAL AMBIENT BACKGROUND MUSIC */
+
+let audioContext = null;
+let musicPlaying = false;
+let musicTimer = null;
+let musicNodes = [];
+
+function playNote(frequency, startTime, duration, volume = 0.035) {
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(volume, startTime + 0.4);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration);
+
+    musicNodes.push(oscillator);
+}
+
+const melody = [
+    261.63, 329.63, 392.00, 329.63,
+    293.66, 349.23, 440.00, 349.23,
+    261.63, 329.63, 392.00, 523.25,
+    440.00, 392.00, 329.63, 293.66
+];
+
+function playMelody() {
+    if (!musicPlaying || !audioContext) return;
+
+    const now = audioContext.currentTime;
+
+    melody.forEach((note, i) => {
+        playNote(note, now + i * 0.65, 2.4, 0.025);
+    });
+}
+
+async function toggleMusic() {
+    const button = document.getElementById('musicButton');
+
+    if (!musicPlaying) {
+        try {
+            if (!audioContext) {
+                const AudioContextClass =
+                    window.AudioContext || window.webkitAudioContext;
+
+                if (!AudioContextClass) {
+                    button.textContent = 'Music unavailable';
+                    return;
+                }
+
+                audioContext = new AudioContextClass();
+            }
+
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            musicPlaying = true;
+            button.textContent = '♫ Music On';
+
+            playMelody();
+            musicTimer = setInterval(playMelody, 10400);
+
+        } catch (error) {
+            button.textContent = 'Music unavailable';
+        }
+
+    } else {
+        musicPlaying = false;
+        button.textContent = '♫ Music Off';
+
+        if (musicTimer) {
+            clearInterval(musicTimer);
+            musicTimer = null;
+        }
+
+        if (audioContext) {
+            audioContext.suspend();
+        }
+    }
+}
+
+/* FLOATING HEARTS */
+
+function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+
+    const symbols = ['♡', '♥', '✧', '💕'];
+    heart.textContent =
+        symbols[Math.floor(Math.random() * symbols.length)];
+
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.fontSize = (12 + Math.random() * 18) + 'px';
+    heart.style.color =
+        Math.random() > 0.5 ? '#ff9fcf' : '#d9a5ff';
+
+    heart.style.animationDuration = (7 + Math.random() * 5) + 's';
+
+    document.body.appendChild(heart);
+
+    setTimeout(() => heart.remove(), 13000);
+}
+
+setInterval(createHeart, 1100);
+
+/* STAR BACKGROUND */
+
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+
+let stars = [];
+
+function resizeCanvas() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = window.innerWidth * ratio;
+    canvas.height = window.innerHeight * ratio;
+
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    stars = [];
+
+    for (let i = 0; i < 150; i++) {
+        stars.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            radius: Math.random() * 1.5 + 0.2,
+            alpha: Math.random()
+        });
+    }
+}
+
+function drawStars() {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+        ctx.fill();
+
+        star.alpha += (Math.random() - 0.5) * 0.025;
+        star.alpha = Math.max(0.15, Math.min(1, star.alpha));
+    });
+
+    requestAnimationFrame(drawStars);
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+drawStars();
+
+</script>
+
+</body>
+</html>
+
+
